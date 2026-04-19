@@ -1,25 +1,49 @@
 package com.example.attendancesystem.controller;
 
 import com.example.attendancesystem.entity.Attendance;
+import com.example.attendancesystem.service.impl.AttendanceService;
 import com.example.attendancesystem.common.Result;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import java.util.List;
 
 @RestController
 @RequestMapping("/attendance")
 public class AttendanceController {
 
-    // 任务三：考勤记录更新接口
-    @PostMapping("/update")
-    public Result<String> updateAttendance(@RequestBody Attendance attendance) {
-        // 打印接收到的考勤记录（方便调试）
-        System.out.println("===== 接收到考勤记录 =====");
-        System.out.println("学号：" + attendance.getStudentId());
-        System.out.println("日期：" + attendance.getDate());
-        System.out.println("状态：" + attendance.getStatus());
-        System.out.println("备注：" + attendance.getRemark());
-        System.out.println("=========================");
+    @Autowired
+    private AttendanceService attendanceService;
 
-        // 返回成功消息
-        return Result.success("考勤记录更新成功");
+    @PostMapping("/add")
+    public Result<Attendance> add(@RequestBody Attendance attendance) {
+        Attendance saved = attendanceService.save(attendance);
+        return Result.success(saved);
+    }
+
+    @GetMapping("/{id}")
+    public Result<Attendance> findById(@PathVariable Long id) {
+        Attendance attendance = attendanceService.findById(id);
+        return attendance == null ? Result.error("未找到") : Result.success(attendance);
+    }
+
+    @GetMapping("/list")
+    public Result<List<Attendance>> findAll() {
+        return Result.success(attendanceService.findAll());
+    }
+
+    @DeleteMapping("/{id}")
+    public Result<String> deleteById(@PathVariable Long id) {
+        attendanceService.deleteById(id);
+        return Result.success("删除成功");
+    }
+
+    @GetMapping("/student/{studentId}")
+    public Result<List<Attendance>> findByStudentId(@PathVariable String studentId) {
+        return Result.success(attendanceService.findByStudentId(studentId));
+    }
+
+    @GetMapping("/course/{courseId}")
+    public Result<List<Attendance>> findByCourseId(@PathVariable String courseId) {
+        return Result.success(attendanceService.findByCourseId(courseId));
     }
 }

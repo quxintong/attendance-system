@@ -1,52 +1,50 @@
 package com.example.attendancesystem.controller;
 
 import com.example.attendancesystem.entity.Student;
+import com.example.attendancesystem.service.impl.StudentService;
 import com.example.attendancesystem.common.Result;
-import com.example.attendancesystem.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
+@RequestMapping("/student")
 public class StudentController {
 
     @Autowired
     private StudentService studentService;
 
-    @GetMapping("/student/info")
-    public String getStudentInfo() {
-        return "姓名：屈昕彤，学号：42411127";
+    @PostMapping("/add")
+    public Result<Student> add(@RequestBody Student student) {
+        Student saved = studentService.save(student);
+        return Result.success(saved);
     }
 
-    @PostMapping("/student/attendance")
-    public String attendance(@RequestBody String studentId) {
-        return "学号为 " + studentId + " 的学生打卡成功";
+    @GetMapping("/{id}")
+    public Result<Student> findById(@PathVariable Long id) {
+        Student student = studentService.findById(id);
+        return student == null ? Result.error("未找到") : Result.success(student);
     }
 
-    @GetMapping("/student/courses")
-    public List<String> getCourses() {
-        List<String> courses = new ArrayList<>();
-        courses.add("java ee开发实践");
-        courses.add("高数");
-        courses.add("创新程序设计实践");
-        return courses;
+    @GetMapping("/list")
+    public Result<List<Student>> findAll() {
+        return Result.success(studentService.findAll());
     }
 
-    @GetMapping("/student/info/{studentId}")
-    public Result<Student> getStudentByPath(@PathVariable String studentId) {
-        Student student = studentService.getStudentById(studentId);
-        if (student == null) {
-            return Result.error("未找到该学生");
-        }
-        return Result.success(student);
+    @DeleteMapping("/{id}")
+    public Result<String> deleteById(@PathVariable Long id) {
+        studentService.deleteById(id);
+        return Result.success("删除成功");
     }
 
-    @GetMapping("/student/list")
-    public Result<List<Student>> getStudentList(
-            @RequestParam(required = false) String name,
-            @RequestParam(required = false) String studentId) {
-        List<Student> studentList = studentService.getStudentList(name, studentId);
-        return Result.success(studentList);
+    @GetMapping("/studentId/{studentId}")
+    public Result<Student> findByStudentId(@PathVariable String studentId) {
+        Student student = studentService.findByStudentId(studentId);
+        return student == null ? Result.error("未找到") : Result.success(student);
+    }
+
+    @GetMapping("/class/{className}")
+    public Result<List<Student>> findByClassName(@PathVariable String className) {
+        return Result.success(studentService.findByClassName(className));
     }
 }

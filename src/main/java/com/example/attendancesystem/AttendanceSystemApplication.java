@@ -23,4 +23,5 @@ public class AttendanceSystemApplication {
 	public String about() {
 		return "姓名：屈昕彤，专业：计算机科学与技术";
 	}
+
 }
