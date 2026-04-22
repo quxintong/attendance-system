@@ -1,10 +1,25 @@
 package com.example.attendancesystem.entity;
 
+import javax.persistence.*;
+
+@Entity
+@Table(name = "student")
 public class Student {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "student_id", nullable = false, unique = true, length = 20)
     private String studentId;
+
+    @Column(name = "name", nullable = false, length = 50)
     private String name;
+
+    @Column(name = "gender", length = 2)
     private String gender;
+
+    @Column(name = "class_name", length = 50)
     private String className;
 
     public Student() {}

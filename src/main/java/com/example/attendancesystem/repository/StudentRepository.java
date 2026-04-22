@@ -1,13 +1,19 @@
 package com.example.attendancesystem.repository;
 
 import com.example.attendancesystem.entity.Student;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.stereotype.Repository;
 import java.util.List;
 
-public interface StudentRepository {
-    Student save(Student student);
-    Student findById(Long id);
-    List<Student> findAll();
-    void deleteById(Long id);
+@Repository
+public interface StudentRepository extends JpaRepository<Student, Long>, JpaSpecificationExecutor<Student> {
     Student findByStudentId(String studentId);
     List<Student> findByClassName(String className);
+
+    // QueryByExample 方法
+    <S extends Student> Page<S> findAll(Example<S> example, Pageable pageable);
 }

@@ -4,6 +4,10 @@ import com.example.attendancesystem.entity.Student;
 import com.example.attendancesystem.service.impl.StudentService;
 import com.example.attendancesystem.common.Result;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -46,5 +50,23 @@ public class StudentController {
     @GetMapping("/class/{className}")
     public Result<List<Student>> findByClassName(@PathVariable String className) {
         return Result.success(studentService.findByClassName(className));
+    }
+
+    @GetMapping("/page")
+    public Result<Page<Student>> findPage(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
+        return Result.success(studentService.findAll(pageable));
+    }
+
+    @GetMapping("/search")
+    public Result<Page<Student>> search(
+            @RequestParam(required = false) String className,
+            @RequestParam(required = false) String name,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
+        return Result.success(studentService.searchByExample(className, name, pageable));
     }
 }
