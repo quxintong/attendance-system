@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @SpringBootApplication
-@RestController // 1. 添加该注解，表示这是一个控制器
+@RestController
 public class AttendanceSystemApplication {
 
 	public static void main(String[] args) {

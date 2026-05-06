@@ -14,6 +14,5 @@ public interface StudentRepository extends JpaRepository<Student, Long>, JpaSpec
     Student findByStudentId(String studentId);
     List<Student> findByClassName(String className);
 
-    // QueryByExample 方法
     <S extends Student> Page<S> findAll(Example<S> example, Pageable pageable);
 }
