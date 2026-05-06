@@ -31,10 +31,17 @@ public class SecurityConfig {
         http
                 .userDetailsService(userDetailsService)
                 .authorizeRequests()
-                .antMatchers("/register/**").permitAll()  // 注册接口无需登录
+                .antMatchers("/login-page", "/register-page", "/register", "/css/**", "/js/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()
+                .loginPage("/login-page")
+                .loginProcessingUrl("/login")
+                .defaultSuccessUrl("/student/list")
+                .failureUrl("/login-page?error=true")
+                .permitAll()
+                .and()
+                .logout()
                 .permitAll()
                 .and()
                 .csrf().disable();
