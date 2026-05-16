@@ -2,71 +2,109 @@ package com.example.attendancesystem.controller;
 
 import com.example.attendancesystem.entity.Student;
 import com.example.attendancesystem.service.impl.StudentService;
-import com.example.attendancesystem.common.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import java.util.List;
 
-@RestController
+@Controller
 @RequestMapping("/student")
 public class StudentController {
 
     @Autowired
     private StudentService studentService;
 
-    @PostMapping("/add")
-    public Result<Student> add(@RequestBody Student student) {
-        Student saved = studentService.save(student);
-        return Result.success(saved);
-    }
-
-    @GetMapping("/{id}")
-    public Result<Student> findById(@PathVariable Long id) {
-        Student student = studentService.findById(id);
-        return student == null ? Result.error("未找到") : Result.success(student);
-    }
-
+    // 学生列表页面（带搜索、排序、分页）
     @GetMapping("/list")
-    public Result<List<Student>> findAll() {
-        return Result.success(studentService.findAll());
+    public String list(@RequestParam(defaultValue = "1") int page,
+                       @RequestParam(defaultValue = "10") int size,
+                       @RequestParam(required = false) String keyword,
+                       @RequestParam(defaultValue = "id") String sortField,
+                       @RequestParam(defaultValue = "asc") String sortDirection,
+                       Model model) {
+
+        Sort sort = sortDirection.equals("asc") ? Sort.by(sortField).ascending() : Sort.by(sortField).descending();
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
+        Page<Student> studentPage;
+
+        if (keyword != null && !keyword.isEmpty()) {
+            studentPage = studentService.search(keyword, pageable);
+            model.addAttribute("keyword", keyword);
+        } else {
+            studentPage = studentService.findAll(pageable);
+        }
+
+        model.addAttribute("students", studentPage.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", studentPage.getTotalPages());
+        model.addAttribute("totalElements", studentPage.getTotalElements());
+        model.addAttribute("size", size);
+        model.addAttribute("sortField", sortField);
+        model.addAttribute("sortDirection", sortDirection);
+
+        return "student-list";
     }
 
-    @DeleteMapping("/{id}")
-    public Result<String> deleteById(@PathVariable Long id) {
+    // 新增学生页面
+    @GetMapping("/add")
+    public String addPage(Model model) {
+        model.addAttribute("student", new Student());
+        return "student-form";
+    }
+
+    // 编辑学生页面
+    @GetMapping("/edit/{id}")
+    public String editPage(@PathVariable Long id, Model model) {
+        Student student = studentService.findById(id);
+        model.addAttribute("student", student);
+        return "student-form";
+    }
+
+    // 保存学生（带验证）
+    @PostMapping("/save")
+    public String save(@ModelAttribute Student student, Model model) {
+        // 验证学号是否已存在
+        Student existing = studentService.findByStudentId(student.getStudentId());
+        if (existing != null && !existing.getId().equals(student.getId())) {
+            model.addAttribute("error", "学号已存在");
+            model.addAttribute("student", student);
+            return "student-form";
+        }
+
+        // 验证必填字段
+        if (student.getStudentId() == null || student.getStudentId().isEmpty()) {
+            model.addAttribute("error", "学号不能为空");
+            model.addAttribute("student", student);
+            return "student-form";
+        }
+        if (student.getName() == null || student.getName().isEmpty()) {
+            model.addAttribute("error", "姓名不能为空");
+            model.addAttribute("student", student);
+            return "student-form";
+        }
+
+        studentService.save(student);
+        return "redirect:/student/list";
+    }
+
+    // 删除学生
+    @GetMapping("/delete/{id}")
+    public String delete(@PathVariable Long id) {
         studentService.deleteById(id);
-        return Result.success("删除成功");
+        return "redirect:/student/list";
     }
 
-    @GetMapping("/studentId/{studentId}")
-    public Result<Student> findByStudentId(@PathVariable String studentId) {
-        Student student = studentService.findByStudentId(studentId);
-        return student == null ? Result.error("未找到") : Result.success(student);
-    }
-
-    @GetMapping("/class/{className}")
-    public Result<List<Student>> findByClassName(@PathVariable String className) {
-        return Result.success(studentService.findByClassName(className));
-    }
-
-    @GetMapping("/page")
-    public Result<Page<Student>> findPage(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
-        return Result.success(studentService.findAll(pageable));
-    }
-
-    @GetMapping("/search")
-    public Result<Page<Student>> search(
-            @RequestParam(required = false) String className,
-            @RequestParam(required = false) String name,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
-        return Result.success(studentService.searchByExample(className, name, pageable));
+    // 批量删除
+    @GetMapping("/batchDelete")
+    public String batchDelete(@RequestParam String ids) {
+        String[] idArray = ids.split(",");
+        for (String id : idArray) {
+            studentService.deleteById(Long.parseLong(id));
+        }
+        return "redirect:/student/list";
     }
 }

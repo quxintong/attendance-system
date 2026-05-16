@@ -3,31 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <title>用户注册</title>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.0/css/bootstrap.min.css}" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
-<body>
-<h1>用户注册</h1>
-<form action="/register" method="post">
-    <div>
-        <label>用户名：</label>
-        <input type="text" name="username" />
+<body class="bg-light">
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white text-center">
+                    <h4><i class="fas fa-user-plus"></i> 用户注册</h4>
+                </div>
+                <div class="card-body">
+                    <form action="/register" method="post">
+                        <div class="mb-3">
+                            <label><i class="fas fa-user"></i> 用户名：</label>
+                            <input type="text" name="username" class="form-control" />
+                        </div>
+                        <div class="mb-3">
+                            <label><i class="fas fa-lock"></i> 密码：</label>
+                            <input type="password" name="password" class="form-control" />
+                        </div>
+                        <div class="mb-3">
+                            <label><i class="fas fa-lock"></i> 确认密码：</label>
+                            <input type="password" name="confirmPassword" class="form-control" />
+                        </div>
+                        <div class="mb-3">
+                            <label><i class="fas fa-id-card"></i> 真实姓名：</label>
+                            <input type="text" name="realName" class="form-control" />
+                        </div>
+                        <div th:if="${error}" class="alert alert-danger">
+                            <i class="fas fa-exclamation-triangle"></i> <span th:text="${error}"></span>
+                        </div>
+                        <button type="submit" class="btn btn-success w-100">
+                            <i class="fas fa-check-circle"></i> 注册
+                        </button>
+                    </form>
+                </div>
+                <div class="card-footer text-center">
+                    <a th:href="@{/login-page}"><i class="fas fa-sign-in-alt"></i> 已有账号？去登录</a>
+                </div>
+            </div>
+        </div>
     </div>
-    <div>
-        <label>密码：</label>
-        <input type="password" name="password" />
-    </div>
-    <div>
-        <label>确认密码：</label>
-        <input type="password" name="confirmPassword" />
-    </div>
-    <div>
-        <label>真实姓名：</label>
-        <input type="text" name="realName" />
-    </div>
-    <div th:if="${error}">
-        <p style="color:red" th:text="${error}"></p>
-    </div>
-    <button type="submit">注册</button>
-</form>
-<a href="/login-page">已有账号？去登录</a>
+</div>
 </body>
 </html>

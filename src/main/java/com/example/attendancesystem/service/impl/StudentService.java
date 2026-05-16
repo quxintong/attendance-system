@@ -13,5 +13,5 @@ public interface StudentService {
     Student findByStudentId(String studentId);
     List<Student> findByClassName(String className);
     Page<Student> findAll(Pageable pageable);
-    Page<Student> searchByExample(String className, String name, Pageable pageable);
+    Page<Student> search(String keyword, Pageable pageable);
 }

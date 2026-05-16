@@ -1,7 +1,6 @@
 package com.example.attendancesystem.repository;
 
 import com.example.attendancesystem.entity.Student;
-import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,6 +12,5 @@ import java.util.List;
 public interface StudentRepository extends JpaRepository<Student, Long>, JpaSpecificationExecutor<Student> {
     Student findByStudentId(String studentId);
     List<Student> findByClassName(String className);
-
-    <S extends Student> Page<S> findAll(Example<S> example, Pageable pageable);
+    Page<Student> findByNameContainingOrStudentIdContaining(String name, String studentId, Pageable pageable);
 }

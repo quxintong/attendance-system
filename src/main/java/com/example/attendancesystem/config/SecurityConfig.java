@@ -31,7 +31,7 @@ public class SecurityConfig {
         http
                 .userDetailsService(userDetailsService)
                 .authorizeRequests()
-                .antMatchers("/login-page", "/register-page", "/register", "/css/**", "/js/**").permitAll()
+                .antMatchers("/login-page", "/register-page", "/register", "/webjars/**", "/css/**", "/js/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()
@@ -42,6 +42,7 @@ public class SecurityConfig {
                 .permitAll()
                 .and()
                 .logout()
+                .logoutSuccessUrl("/login-page")
                 .permitAll()
                 .and()
                 .csrf().disable();
